@@ -1,0 +1,66 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartReplenishment.Clients.StockLevelEmitter", "Clients\SmartReplenishment.Clients.StockLevelEmitter\SmartReplenishment.Clients.StockLevelEmitter.csproj", "{4F92BC89-9AF1-46E9-8575-BF297B7902AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartReplenishment.Infrastructure.AspireAppHost", "Infrastructure\SmartReplenishment.Infrastructure.AspireAppHost\SmartReplenishment.Infrastructure.AspireAppHost.csproj", "{7CB0E903-DC51-48FA-AAFA-D83C83836FD0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartReplenishment.Infrastrucutre.AspireServiceDefaults", "Infrastructure\SmartReplenishment.Infrastrucutre.AspireServiceDefaults\SmartReplenishment.Infrastrucutre.AspireServiceDefaults.csproj", "{30629A03-5408-45A7-BBED-AF15678FA7E6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Clients", "Clients", "{8EE1DEF0-BA5F-4C7B-B6AA-0059FD117C68}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{68A79336-0809-4B01-BAE7-9C15AA26C6E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{52D65012-C164-4E30-AEA5-061281923D65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartReplenishment.Services.InventoryService", "Services\SmartReplenishment.Services.InventoryService\SmartReplenishment.Services.InventoryService.csproj", "{0C1ED4AE-B7FC-44E8-AD29-CF18F2B80BB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartReplenishment.Services.FullfillmentService", "Services\SmartReplenishment.Services.FullfillmentService\SmartReplenishment.Services.FullfillmentService.csproj", "{40F66682-064D-40C2-8612-176E3D753852}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartReplenishment.Services.NotificationService", "Services\SmartReplenishment.Services.NotificationService\SmartReplenishment.Services.NotificationService.csproj", "{46BAF238-00D9-44C6-898F-7372C04C98EA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F92BC89-9AF1-46E9-8575-BF297B7902AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F92BC89-9AF1-46E9-8575-BF297B7902AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F92BC89-9AF1-46E9-8575-BF297B7902AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F92BC89-9AF1-46E9-8575-BF297B7902AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CB0E903-DC51-48FA-AAFA-D83C83836FD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CB0E903-DC51-48FA-AAFA-D83C83836FD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CB0E903-DC51-48FA-AAFA-D83C83836FD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CB0E903-DC51-48FA-AAFA-D83C83836FD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30629A03-5408-45A7-BBED-AF15678FA7E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30629A03-5408-45A7-BBED-AF15678FA7E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30629A03-5408-45A7-BBED-AF15678FA7E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30629A03-5408-45A7-BBED-AF15678FA7E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C1ED4AE-B7FC-44E8-AD29-CF18F2B80BB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C1ED4AE-B7FC-44E8-AD29-CF18F2B80BB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C1ED4AE-B7FC-44E8-AD29-CF18F2B80BB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C1ED4AE-B7FC-44E8-AD29-CF18F2B80BB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40F66682-064D-40C2-8612-176E3D753852}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40F66682-064D-40C2-8612-176E3D753852}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40F66682-064D-40C2-8612-176E3D753852}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40F66682-064D-40C2-8612-176E3D753852}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46BAF238-00D9-44C6-898F-7372C04C98EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46BAF238-00D9-44C6-898F-7372C04C98EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46BAF238-00D9-44C6-898F-7372C04C98EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46BAF238-00D9-44C6-898F-7372C04C98EA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4F92BC89-9AF1-46E9-8575-BF297B7902AA} = {8EE1DEF0-BA5F-4C7B-B6AA-0059FD117C68}
+		{7CB0E903-DC51-48FA-AAFA-D83C83836FD0} = {68A79336-0809-4B01-BAE7-9C15AA26C6E8}
+		{30629A03-5408-45A7-BBED-AF15678FA7E6} = {68A79336-0809-4B01-BAE7-9C15AA26C6E8}
+		{0C1ED4AE-B7FC-44E8-AD29-CF18F2B80BB6} = {52D65012-C164-4E30-AEA5-061281923D65}
+		{40F66682-064D-40C2-8612-176E3D753852} = {52D65012-C164-4E30-AEA5-061281923D65}
+		{46BAF238-00D9-44C6-898F-7372C04C98EA} = {52D65012-C164-4E30-AEA5-061281923D65}
+	EndGlobalSection
+EndGlobal

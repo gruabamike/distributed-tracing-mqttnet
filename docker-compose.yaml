@@ -1,0 +1,19 @@
+services:
+
+  # MQTT Broker
+  emqx-broker:
+    image: emqx:5.8.4
+    container_name: emqx-broker
+    environment:
+      - "EMQX_NODE_NAME=emqx@node01.emqx.io"
+    healthcheck:
+      test: ["CMD", "/opt/emqx/bin/emqx", "ctl", "status"]
+      interval: 5s
+      timeout: 25s
+      retries: 5
+    ports:
+      - "1883:1883"   # MQTT over TCP
+      - "8083:8083"   # MQTT over WebSocket
+      - "8883:8883"   # MQTT over SSL/TLS
+      - "8084:8084"   # MQTT over WSS/TLS
+      - "18083:18083" # Dashboard

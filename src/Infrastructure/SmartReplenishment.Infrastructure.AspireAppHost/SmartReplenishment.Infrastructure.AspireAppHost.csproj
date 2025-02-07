@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Aspire.AppHost.Sdk" Version="9.0.0" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsAspireHost>true</IsAspireHost>
+    <UserSecretsId>b9b104d4-c71d-4bed-b3de-059156fd4c38</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.0.0" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Clients\SmartReplenishment.Clients.StockLevelEmitter\SmartReplenishment.Clients.StockLevelEmitter.csproj" />
+    <ProjectReference Include="..\..\Services\SmartReplenishment.Services.FullfillmentService\SmartReplenishment.Services.FullfillmentService.csproj" />
+    <ProjectReference Include="..\..\Services\SmartReplenishment.Services.InventoryService\SmartReplenishment.Services.InventoryService.csproj" />
+    <ProjectReference Include="..\..\Services\SmartReplenishment.Services.NotificationService\SmartReplenishment.Services.NotificationService.csproj" />
+  </ItemGroup>
+
+</Project>
