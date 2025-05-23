@@ -1,19 +1,111 @@
+# Docker Compose: Instrumenting MQTTnet for Distributed Tracing with OpenTelemetry
+
 services:
 
-  # MQTT Broker
-  emqx-broker:
-    image: emqx:5.8.4
-    container_name: emqx-broker
-    environment:
-      - "EMQX_NODE_NAME=emqx@node01.emqx.io"
-    healthcheck:
-      test: ["CMD", "/opt/emqx/bin/emqx", "ctl", "status"]
-      interval: 5s
-      timeout: 25s
-      retries: 5
+  # Mosquitto MQTT Broker
+  mqtt-broker:
+    image: eclipse-mosquitto:2.0.21
+    container_name: mqtto-broker
     ports:
-      - "1883:1883"   # MQTT over TCP
-      - "8083:8083"   # MQTT over WebSocket
-      - "8883:8883"   # MQTT over SSL/TLS
-      - "8084:8084"   # MQTT over WSS/TLS
-      - "18083:18083" # Dashboard
+      - "1883:1883" # Default MQTT Port
+      - "9001:9001" # Default MQTT Port for WebSockets
+    volumes:
+      - ./docker/mosquitto/config:/mosquitto/config:rw
+      - ./docker/mosquitto/data:/mosquitto/data:rw
+      - ./docker/mosquitto/log:/mosquitto/log:rw
+    restart: unless-stopped
+
+  inventory-db:
+    image: postgres:16
+    container_name: inventory-db
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: inventory_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./docker/postgres/data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    restart: always
+
+  inventory-db-web:
+    image: dpage/pgadmin4:9.3.0
+    container_name: inventory-db-web
+    environment:
+      PGADMIN_DEFAULT_EMAIL: root@root.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "8900:8888"
+    restart: always
+
+  inventory-cache:
+    image: redis:8.0.1
+    container_name: inventory-cache
+    ports:
+      - "6379:6379"
+    restart: always
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.126.0
+    container_name: otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./docker/otel/config/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+      - ./docker/otel/log:/log/otel
+    environment:
+      JAEGER_ENDPOINT: "jaeger:4317"
+      LOKI_ENDPOINT: "http://loki:3100/loki/api/v1/push"
+    ports:
+      - "1888:1888"   # pprof Extension
+      - "4317:4317"   # OTLP gRPC Receiver
+      - "4318:4318"   # OLTP HTTP Receiver
+      - "8888:8888"   # Prometheus Metrics Exposed by the OTel Colltector
+      - "8889:8889"   # Prometheus Exporter Metrics
+      - "13133:13133" # health_check Extensions
+      - "55679:55679" # zpages Extension
+    depends_on:
+      - loki
+      - prometheus
+      - jaeger
+
+  loki:
+    image: grafana/loki:3.5
+    container_name: loki
+    ports:
+      - "3100:3100"
+
+  prometheus:
+    image: prom/prometheus:v3.4.0
+    container_name: prometheus
+    command: --config.file=/etc/prometheus/prometheus.yml --no-scrape.adjust-timestamps
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus/config/prometheus.yaml:/etc/prometheus/prometheus.yml  # Config File in Container MUST have the File Extension ".yml"
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.69.0
+    container_name: jaeger
+    ports:
+      #- "4317:4317"   # OTLP over gRPC
+      #- "4318:4318"   # OTLP over HTTP
+      - "16686:16686" # Jaeger Web UI
+
+  grafana:
+    image: grafana/grafana-oss:12.0.1
+    container_name: grafana
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+    #volumes:
+    #  - ./grafana-configuration/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    #  - ./grafana-configuration/grafana-dashboards.yaml:/etc/grafana/provisioning/dashboards/main.yaml
+    #  - ./grafana-configuration/dashboards:/var/lib/grafana/dashboards
+    ports:
+      - "3000:3000"

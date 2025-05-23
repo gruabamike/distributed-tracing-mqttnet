@@ -1,0 +1,17 @@
+# Configuration to Scrape Data from Itself
+# https://prometheus.io/docs/prometheus/latest/getting_started/#configuring-prometheus-to-monitor-itself
+global:
+  scrape_interval: 10s
+  scrape_timeout: 10s
+  evaluation_interval: 10s
+
+scrape_configs:
+- job_name: "prometheus"
+  static_configs:
+    - targets: ["prometheus:9090"]
+- job_name: "otelcol"
+  static_configs:
+    - targets: ["otel-collector:8888"]
+- job_name: "otelcol-metrics"
+  static_configs:
+    - targets: ["otel-collector:8889"]

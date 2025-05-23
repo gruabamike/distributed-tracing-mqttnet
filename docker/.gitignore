@@ -1,0 +1,6 @@
+# Ignore Docker Container Volumes and Logs
+**/data/
+**/log/
+
+# Do NOT Ignore Configuration Folders
+!**/config/
