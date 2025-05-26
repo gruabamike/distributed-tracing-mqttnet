@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
+    <PackageReference Include="MQTTnet" Version="5.0.1.1416" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\CrossCutting\SmartReplenishment.Extensions.Hosting.ServiceDefaults\SmartReplenishment.Extensions.Hosting.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\CrossCutting\SmartReplenishment.Messaging.Mqtt\SmartReplenishment.Messaging.Mqtt.csproj" />
+    <ProjectReference Include="..\..\Shared\SmartReplenishment.Shared.Model\SmartReplenishment.Shared.Model.csproj" />
+  </ItemGroup>
+
+</Project>

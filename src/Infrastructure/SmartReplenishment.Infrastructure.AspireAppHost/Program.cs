@@ -17,14 +17,11 @@ var simulation01 = builder.AddProject<SmartReplenishment_Clients_StockLevelEmitt
     //.WithEnvironment("SIMULATION_ID", "1");
     //.WithEnvironment("CONFIG_PATH", "appsettings.sim1.json");
 
-var inventoryService = builder.AddProject<SmartReplenishment_Services_InventoryService>("inventorysvc")
-    .WithReference(inventoryDb)
-    .WaitFor(mqttBroker);
+//var inventoryService = builder.AddProject<SmartReplenishment_Services_InventoryService>("inventorysvc")
+//    .WithReference(inventoryDb)
+//    .WaitFor(mqttBroker);
 
-var fullfillmentService = builder.AddProject<SmartReplenishment_Services_FullfillmentService>("fullfillmentsvc")
-    .WaitFor(mqttBroker);
-
-var notificationService = builder.AddProject<SmartReplenishment_Services_NotificationService>("notificationsvc")
-    .WaitFor(mqttBroker);
+//var fullfillmentService = builder.AddProject<SmartReplenishment_Services_FullfillmentService>("fullfillmentsvc")
+//    .WaitFor(mqttBroker);
 
 builder.Build().Run();

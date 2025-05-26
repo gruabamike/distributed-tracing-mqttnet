@@ -1,5 +1,8 @@
 # Docker Compose: Instrumenting MQTTnet for Distributed Tracing with OpenTelemetry
 
+# Port Overview
+# TODO
+
 services:
 
   # Mosquitto MQTT Broker
@@ -60,11 +63,11 @@ services:
       - ./docker/otel/log:/log/otel
     environment:
       JAEGER_ENDPOINT: "jaeger:4317"
-      LOKI_ENDPOINT: "http://loki:3100/loki/api/v1/push"
+      LOKI_ENDPOINT: "http://loki:3100/otlp"
     ports:
       - "1888:1888"   # pprof Extension
       - "4317:4317"   # OTLP gRPC Receiver
-      - "4318:4318"   # OLTP HTTP Receiver
+      - "4318:4318"   # OTLP HTTP Receiver
       - "8888:8888"   # Prometheus Metrics Exposed by the OTel Colltector
       - "8889:8889"   # Prometheus Exporter Metrics
       - "13133:13133" # health_check Extensions
@@ -77,8 +80,11 @@ services:
   loki:
     image: grafana/loki:3.5
     container_name: loki
+    command: -config.file=/etc/loki/loki-config.yaml
     ports:
       - "3100:3100"
+    volumes:
+      - ./docker/loki/config/loki-config.yaml:/etc/loki/loki-config.yaml
 
   prometheus:
     image: prom/prometheus:v3.4.0

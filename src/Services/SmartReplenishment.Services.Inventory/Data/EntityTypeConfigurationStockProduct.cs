@@ -1,0 +1,31 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SmartReplenishment.Shared.Model;
+
+namespace SmartReplenishment.Services.Inventory.Data;
+
+public class EntityTypeConfigurationStockProduct : EntityTypeConfigurationBase<StockProduct>
+{
+  protected override string TableName => "stock_products";
+
+  protected override void ConfigureEntity(EntityTypeBuilder<StockProduct> builder)
+  {
+    builder.Property(sp => sp.Name)
+      .HasColumnName("name")
+      .HasMaxLength(MaxStringLength)
+      .IsRequired();
+
+    builder.HasIndex(sp => sp.Name)
+      .IsUnique();
+
+    builder.Property(sp => sp.Amount)
+      .HasColumnName("amount")
+      .IsRequired();
+
+    builder.HasOne(sp => sp.StockConfiguration)
+      .WithOne(sc => sc.StockProduct)
+      .HasForeignKey<StockConfiguration>(sp => sp.StockProductId)
+      .IsRequired()
+      .OnDelete(DeleteBehavior.Cascade);
+  }
+}

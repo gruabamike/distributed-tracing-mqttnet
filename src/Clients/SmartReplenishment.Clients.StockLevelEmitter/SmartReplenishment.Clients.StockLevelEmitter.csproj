@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Infrastructure\SmartReplenishment.Infrastrucutre.AspireServiceDefaults\SmartReplenishment.Infrastrucutre.AspireServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\CrossCutting\SmartReplenishment.Extensions.Hosting.ServiceDefaults\SmartReplenishment.Extensions.Hosting.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\CrossCutting\SmartReplenishment.Messaging.Mqtt\SmartReplenishment.Messaging.Mqtt.csproj" />
   </ItemGroup>
 </Project>

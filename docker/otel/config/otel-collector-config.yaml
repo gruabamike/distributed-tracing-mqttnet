@@ -18,8 +18,10 @@ extensions:
 receivers:
   otlp:
     protocols:
-      http:
       grpc:
+        endpoint: otel-collector:4317
+      http:
+        endpoint: otel-collector:4318
 
 # batching or filtering
 # documentation of default processors: https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor
@@ -28,27 +30,22 @@ processors:
   batch:
 
 # configure exporters, which forward data to observability backends
-# - loki: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/exporter/lokiexporter/README.md
-# - prometheus: https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/prometheusexporter
+# - Loki: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/exporter/lokiexporter/README.md
+# - Prometheus: https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/prometheusexporter
+# - Jaeger: https://opentelemetry.io/blog/2023/jaeger-exporter-collector-migration/
 exporters:
   debug:
     verbosity: detailed
-  # logs
-  #file/logs:
-  #  path: /log/otel/logs.log
-  loki:
+
+  otlphttp/logs:
     endpoint: "${LOKI_ENDPOINT}"
     tls:
       insecure: true
-  # metrics
-  #file/metrics:
-  #  path: /log/otel/metrics.log
+
   prometheus:
     endpoint: ":8889"
-  # traces
-  #file/traces:
-  #  path: /log/otel/traces.log
-  otlp:
+
+  otlp/jaeger:
     endpoint: "${JAEGER_ENDPOINT}"
     tls:
       insecure: true
@@ -60,7 +57,7 @@ service:
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [loki]
+      exporters: [otlphttp/logs]
     metrics:
       receivers: [otlp]
       processors: [batch]
@@ -68,4 +65,4 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp]
+      exporters: [otlp/jaeger]

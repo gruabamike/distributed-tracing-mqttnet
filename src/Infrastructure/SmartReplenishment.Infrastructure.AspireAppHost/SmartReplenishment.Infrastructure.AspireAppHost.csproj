@@ -18,9 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Clients\SmartReplenishment.Clients.StockLevelEmitter\SmartReplenishment.Clients.StockLevelEmitter.csproj" />
-    <ProjectReference Include="..\..\Services\SmartReplenishment.Services.FullfillmentService\SmartReplenishment.Services.FullfillmentService.csproj" />
-    <ProjectReference Include="..\..\Services\SmartReplenishment.Services.InventoryService\SmartReplenishment.Services.InventoryService.csproj" />
-    <ProjectReference Include="..\..\Services\SmartReplenishment.Services.NotificationService\SmartReplenishment.Services.NotificationService.csproj" />
   </ItemGroup>
 
 </Project>
