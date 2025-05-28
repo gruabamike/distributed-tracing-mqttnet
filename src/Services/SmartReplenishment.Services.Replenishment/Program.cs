@@ -6,12 +6,9 @@ var builder = Host.CreateApplicationBuilder(args);
 // Mqtt Settings
 IMqttSettings? mqttSettings = builder.Configuration
   .GetRequiredSection(IMqttSettings.MqttSettingsKey)
-  .Get<IMqttSettings>();
+  .Get<MqttSettings>();
 
 ArgumentNullException.ThrowIfNull(mqttSettings);
-mqttSettings.ClientId ??= builder.Environment.ApplicationName;
-ArgumentNullException.ThrowIfNull(mqttSettings.TopicNameSubscribe);
-ArgumentNullException.ThrowIfNull(mqttSettings.TopicNamePublish);
 
 // Register Services
 builder.Services.AddSingleton<IMqttSettings>(mqttSettings);

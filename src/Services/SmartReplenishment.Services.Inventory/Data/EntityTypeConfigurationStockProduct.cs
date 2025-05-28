@@ -4,11 +4,11 @@ using SmartReplenishment.Shared.Model;
 
 namespace SmartReplenishment.Services.Inventory.Data;
 
-public class EntityTypeConfigurationStockProduct : EntityTypeConfigurationBase<StockProduct>
+public class EntityTypeConfigurationStockProduct : EntityTypeConfigurationBase<StockArticle>
 {
   protected override string TableName => "stock_products";
 
-  protected override void ConfigureEntity(EntityTypeBuilder<StockProduct> builder)
+  protected override void ConfigureEntity(EntityTypeBuilder<StockArticle> builder)
   {
     builder.Property(sp => sp.Name)
       .HasColumnName("name")
@@ -23,8 +23,8 @@ public class EntityTypeConfigurationStockProduct : EntityTypeConfigurationBase<S
       .IsRequired();
 
     builder.HasOne(sp => sp.StockConfiguration)
-      .WithOne(sc => sc.StockProduct)
-      .HasForeignKey<StockConfiguration>(sp => sp.StockProductId)
+      .WithOne(sc => sc.StockArticle)
+      .HasForeignKey<StockArticleConfiguration>(sp => sp.StockArticleId)
       .IsRequired()
       .OnDelete(DeleteBehavior.Cascade);
   }

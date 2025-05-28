@@ -9,5 +9,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\CrossCutting\SmartReplenishment.Extensions.Hosting.ServiceDefaults\SmartReplenishment.Extensions.Hosting.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\CrossCutting\SmartReplenishment.Messaging.Http\SmartReplenishment.Messaging.Http.csproj" />
+    <ProjectReference Include="..\..\CrossCutting\SmartReplenishment.Messaging.Mqtt\SmartReplenishment.Messaging.Mqtt.csproj" />
   </ItemGroup>
 </Project>

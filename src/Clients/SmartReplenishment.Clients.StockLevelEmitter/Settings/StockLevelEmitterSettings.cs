@@ -2,7 +2,7 @@
 
 internal class StockLevelEmitterSettings : IStockLevelEmitterSettings
 {
-  public required string ProductName { get; set; }
+  public required string ArticleName { get; set; }
 
   public required int StockDecreaseAmount { get; set; }
 }

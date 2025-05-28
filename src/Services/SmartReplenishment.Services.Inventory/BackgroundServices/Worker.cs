@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MQTTnet;
+using Polly;
 using SmartReplenishment.Messaging.Mqtt;
 using SmartReplenishment.Messaging.Mqtt.Messages;
 using SmartReplenishment.Services.Inventory.Data;
@@ -15,38 +16,42 @@ namespace SmartReplenishment.Services.Inventory.BackgroundServices
     private readonly ILogger<Worker> _logger;
     private readonly IMqttClient _mqttClient;
     private readonly IMqttSettings _mqttSettings;
-    private readonly InventoryDbContext _context;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
+
+    private readonly CancellationTokenSource _internalCancellationTokenSource = new();
 
     public Worker(
       ILogger<Worker> logger,
       IMqttClient mqttClient,
       IMqttSettings mqttSettings,
-      InventoryDbContext context)
+      IServiceScopeFactory serviceScopeFactory)
     {
       _logger = logger;
       _mqttClient = mqttClient;
       _mqttSettings = mqttSettings;
-      _context = context;
+      _serviceScopeFactory = serviceScopeFactory;
     }
 
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
       _mqttClient.ApplicationMessageReceivedAsync += OnApplicationMessageReceivedAsync;
 
-      var mqttClientOptions = MqttClientOptionsProvider.Get(_mqttSettings);
-      var response = await _mqttClient.ConnectAsync(mqttClientOptions, cancellationToken);
-      if (response.ResultCode != MqttClientConnectResultCode.Success)
-      {
-        _logger.LogCritical("Could not connect to mqtt broker");
-      }
+      var connectionResult = await MqttRetryPolicies.GetMqttConnectRetryPolicy(_logger)
+      .ExecuteAsync(async () => await _mqttClient.ConnectAsync(
+        MqttClientOptionsProvider.Get(_mqttSettings),
+        cancellationToken));
 
-      if (_mqttSettings.TopicNameSubscribe is null)
-        throw new InvalidOperationException("TODO");
+      if (connectionResult.ResultCode != MqttClientConnectResultCode.Success)
+      {
+        _logger.LogCritical("Failed to connect to MQTT broker after retries. Stopping service...");
+        _internalCancellationTokenSource.Cancel();
+      }
 
       if (_mqttClient.IsConnected)
       {
-        var mqttSubscribeOptions = MqttClientSubscribeOptionsProvider.Get(_mqttSettings.TopicNameSubscribe);
-        await _mqttClient.SubscribeAsync(mqttSubscribeOptions, cancellationToken);
+        await _mqttClient.SubscribeAsync(
+          MqttClientSubscribeOptionsProvider.Get(_mqttSettings.GetRequiredTopicNameSubscribe()),
+          cancellationToken);
       }
 
       await base.StartAsync(cancellationToken);
@@ -56,69 +61,87 @@ namespace SmartReplenishment.Services.Inventory.BackgroundServices
     {
       if (_mqttClient.IsConnected)
         await _mqttClient.DisconnectAsync(MqttClientDisconnectOptionsReason.NormalDisconnection, cancellationToken: cancellationToken);
-      
+
       await base.StopAsync(cancellationToken);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-      while (!stoppingToken.IsCancellationRequested)
-      {
-        if (_logger.IsEnabled(LogLevel.Information))
-        {
-          _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-        }
+      using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, _internalCancellationTokenSource.Token);
+      var combinedToken = linkedCts.Token;
 
-        await Task.Delay(1000, stoppingToken);
+      while (!combinedToken.IsCancellationRequested)
+      {
+        await Task.Delay(1000, combinedToken);
       }
     }
 
     private async Task OnApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs args)
     {
-      var payloadString = Encoding.UTF8.GetString(args.ApplicationMessage.Payload);
-      var message = JsonSerializer.Deserialize<MqttMessageStockLevelChanged>(payloadString);
+      var message = MqttApplicationMessageProvider.GetSubscribeMqttApplicationMessage<MqttMessageStockLevelChanged>(args.ApplicationMessage);
       if (message is null)
       {
+        _logger.LogWarning("Mqtt application message from {topic} by {clientId} is null", args.ApplicationMessage.Topic, args.ClientId);
         return;
       }
 
-      using var activity = InstrumentationSources.ActivitySource.StartActivity("receiving message");
-      _logger.LogInformation("Received application message");
+      _logger.LogInformation(
+        "Updating Article Stock Level Decrease: {articleName} decreased by {stockDecreaseAmount} at {time}",
+        message.ArticleName,
+        message.StockDecreaseAmount,
+        DateTimeOffset.Now);
 
-      var stockProduct = _context.StockProducts
-        .Include(sp => sp.StockConfiguration)
-        .FirstOrDefault(sp => sp.Name == message.ProductName);
+      using var activity = ActivitySourceProvider.ActivitySource.StartActivity("Updating Article Stock Level Decrease");
+      
+      await using var scope = _serviceScopeFactory.CreateAsyncScope();
+      await using var context = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
 
-      if (stockProduct is null || stockProduct.StockConfiguration is null)
+      var stockArticle = await FetchStockArticle(context, message.ArticleName);
+      if (stockArticle is null || stockArticle.StockConfiguration is null)
       {
+        _logger.LogWarning($"Article {message.ArticleName} not found in database");
         return;
       }
 
-      stockProduct.Amount -= message.StockDecreaseAmount;
-      if (stockProduct.Amount < 0)
-        stockProduct.Amount = 0;
-
-      await _context.SaveChangesAsync();
-
-      if (stockProduct.Amount <= stockProduct.StockConfiguration.MinStockThreshold)
+      await UpdateArticleStockAmount(context, stockArticle, message.StockDecreaseAmount);
+      if (stockArticle.Amount <= stockArticle.StockConfiguration.MinStockThreshold)
       {
-        await PublishMessage(stockProduct);
+        await PublishMessageStockLow(stockArticle);
       }
     }
 
-    private async Task PublishMessage(StockProduct stockProduct)
+    private async Task<StockArticle?> FetchStockArticle(InventoryDbContext context, string articleName)
     {
-      //var mqttClientOptions = MqttClientOptionsProvider.Get(_mqttSettings);
-      //var response = await _mqttClient.ConnectAsync(mqttClientOptions);
-      //if (response.ResultCode != MqttClientConnectResultCode.Success)
-      //  return;
+      using var activity = ActivitySourceProvider.ActivitySource.StartActivity(nameof(FetchStockArticle));
+      return await context.StockArticles
+        .Include(sp => sp.StockConfiguration)
+        .FirstOrDefaultAsync(sp => sp.Name == articleName);
+    }
 
-      var message = new MqttMessageStockLow(stockProduct.Name, stockProduct.Amount);
-      var mqttMessage = MqttApplicationMessageProvider.Get(
-        _mqttSettings.TopicNamePublish ?? throw new InvalidOperationException($"No {nameof(IMqttSettings.TopicNamePublish)} specified."),
-        message);
+    private async Task PublishMessageStockLow(StockArticle stockArticle)
+    {
+      if (!_mqttClient.IsConnected)
+      {
+        _logger.LogCritical("Could not publish message {messageType}: no connection to the broker", nameof(MqttMessageStockLow));
+        return;
+      }
+
+      var mqttMessage = MqttApplicationMessageProvider.GetPublishMqttApplicationMessage(
+        _mqttSettings.GetRequiredTopicNamePublish(),
+        new MqttMessageStockLow(stockArticle.Id, stockArticle.Name, stockArticle.Amount));
+
       await _mqttClient.PublishAsync(mqttMessage);
-      //await _mqttClient.DisconnectAsync();
+    }
+
+    private async Task UpdateArticleStockAmount(InventoryDbContext context, StockArticle stockArticle, int stockDecreaseAmount)
+    {
+      using var activity = ActivitySourceProvider.ActivitySource.StartActivity(nameof(UpdateArticleStockAmount));
+
+      stockArticle.Amount -= stockDecreaseAmount;
+      if (stockArticle.Amount < 0)
+        stockArticle.Amount = 0;
+
+      await context.SaveChangesAsync();
     }
   }
 }

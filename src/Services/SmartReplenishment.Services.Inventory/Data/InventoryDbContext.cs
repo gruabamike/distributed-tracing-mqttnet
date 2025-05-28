@@ -7,8 +7,8 @@ public class InventoryDbContext : DbContext
 {
   public InventoryDbContext(DbContextOptions options) : base(options) { }
 
-  public DbSet<StockProduct> StockProducts => Set<StockProduct>();
-  public DbSet<StockConfiguration> StockConfigurations => Set<StockConfiguration>();
+  public DbSet<StockArticle> StockArticles => Set<StockArticle>();
+  public DbSet<StockArticleConfiguration> StockArticleConfigurations => Set<StockArticleConfiguration>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

@@ -4,7 +4,7 @@ public interface IStockLevelEmitterSettings
 {
   public const string StockLevelEmitterSettingsKey = "StockLevelEmitterSettings";
 
-  string ProductName { get; set; }
+  string ArticleName { get; set; }
 
   int StockDecreaseAmount { get; set; }
 }

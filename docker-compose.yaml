@@ -44,8 +44,10 @@ services:
       PGADMIN_DEFAULT_EMAIL: root@root.com
       PGADMIN_DEFAULT_PASSWORD: root
     ports:
-      - "8900:8888"
+      - "8900:80"
     restart: always
+    depends_on:
+      - inventory-db
 
   inventory-cache:
     image: redis:8.0.1

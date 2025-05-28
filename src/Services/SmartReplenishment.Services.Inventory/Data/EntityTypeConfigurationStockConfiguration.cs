@@ -4,13 +4,13 @@ using SmartReplenishment.Shared.Model;
 
 namespace SmartReplenishment.Services.Inventory.Data;
 
-public class EntityTypeConfigurationStockConfiguration : EntityTypeConfigurationBase<StockConfiguration>
+public class EntityTypeConfigurationStockConfiguration : EntityTypeConfigurationBase<StockArticleConfiguration>
 {
   protected override string TableName => "stock_configurations";
 
-  protected override void ConfigureEntity(EntityTypeBuilder<StockConfiguration> builder)
+  protected override void ConfigureEntity(EntityTypeBuilder<StockArticleConfiguration> builder)
   {
-    builder.Property(sc => sc.StockProductId)
+    builder.Property(sc => sc.StockArticleId)
       .HasColumnName("stock_product_id")
       .IsRequired();
 

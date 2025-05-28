@@ -7,16 +7,14 @@ var builder = Host.CreateApplicationBuilder(args);
 // Mqtt Settings
 IMqttSettings? mqttSettings = builder.Configuration
   .GetRequiredSection(IMqttSettings.MqttSettingsKey)
-  .Get<IMqttSettings>();
+  .Get<MqttSettings>();
 
 ArgumentNullException.ThrowIfNull(mqttSettings);
-mqttSettings.ClientId ??= builder.Environment.ApplicationName;
-ArgumentNullException.ThrowIfNull(mqttSettings.TopicNamePublish);
 
 // Stock Level Emitter Settings
 IStockLevelEmitterSettings? stockLevelEmitterSettings = builder.Configuration
   .GetRequiredSection(IStockLevelEmitterSettings.StockLevelEmitterSettingsKey)
-  .Get<IStockLevelEmitterSettings>();
+  .Get<StockLevelEmitterSettings>();
 
 ArgumentNullException.ThrowIfNull(stockLevelEmitterSettings);
 

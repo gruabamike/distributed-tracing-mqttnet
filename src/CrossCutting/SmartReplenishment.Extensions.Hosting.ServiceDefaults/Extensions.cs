@@ -52,23 +52,30 @@ public static class Extensions
     });
 
     builder.Services.AddOpenTelemetry()
-        .WithMetrics(metrics =>
-        {
-          metrics.AddAspNetCoreInstrumentation()
-                  .AddHttpClientInstrumentation()
-                  .AddRuntimeInstrumentation();
-        })
-        .WithTracing(tracing =>
-        {
-          tracing.AddSource(builder.Environment.ApplicationName)
-                  .AddSource("SmartReplenishment.MQTT")
-                  .AddAspNetCoreInstrumentation()
-                  // Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
-                  //.AddGrpcClientInstrumentation()
-                  .AddHttpClientInstrumentation()
-                  .AddMqttNetClientInstrumentation();
+      .ConfigureResource(resource => resource.AddEnvironmentVariableDetector())
+      .WithMetrics(metrics =>
+      {
+        metrics
+          .AddAspNetCoreInstrumentation()
+          .AddHttpClientInstrumentation()
+          .AddRuntimeInstrumentation();
+      })
+      .WithTracing(tracing =>
+      {
+        tracing
+          .AddSource(builder.Environment.ApplicationName)
+          .AddAspNetCoreInstrumentation()
+          // Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
+          //.AddGrpcClientInstrumentation()
+          .AddHttpClientInstrumentation()
+          .AddEntityFrameworkCoreInstrumentation(options =>
+          {
+            options.SetDbStatementForText = true;
+            options.SetDbStatementForStoredProcedure = true;
+          })
+          .AddMqttNetClientInstrumentation();
 
-        });
+      });
 
     builder.AddOpenTelemetryExporters();
 

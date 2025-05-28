@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\CrossCutting\SmartReplenishment.Extensions.Hosting.ServiceDefaults\SmartReplenishment.Extensions.Hosting.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\CrossCutting\SmartReplenishment.Messaging.Http\SmartReplenishment.Messaging.Http.csproj" />
     <ProjectReference Include="..\..\CrossCutting\SmartReplenishment.Messaging.Mqtt\SmartReplenishment.Messaging.Mqtt.csproj" />
     <ProjectReference Include="..\..\Shared\SmartReplenishment.Shared.Model\SmartReplenishment.Shared.Model.csproj" />
   </ItemGroup>

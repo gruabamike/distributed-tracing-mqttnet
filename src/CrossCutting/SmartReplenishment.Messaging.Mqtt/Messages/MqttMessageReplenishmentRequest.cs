@@ -1,3 +1,3 @@
 ﻿namespace SmartReplenishment.Messaging.Mqtt.Messages;
 
-public record MqttMessageReplenishmentRequest(string ProductId, int StockIncreaseAmount) : IMqttMessage;
+public record MqttMessageReplenishmentRequest(Guid ArticleId, string ArticleName, int StockIncreaseAmount) : IMqttMessage;

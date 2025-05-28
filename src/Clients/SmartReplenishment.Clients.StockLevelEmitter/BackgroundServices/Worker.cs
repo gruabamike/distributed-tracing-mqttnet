@@ -1,4 +1,5 @@
 using MQTTnet;
+using Polly;
 using SmartReplenishment.Clients.StockLevelEmitter.Instrumentation;
 using SmartReplenishment.Clients.StockLevelEmitter.Settings;
 using SmartReplenishment.Messaging.Mqtt;
@@ -10,12 +11,14 @@ public class Worker : BackgroundService
 {
   private static readonly Random Random = new Random();
   private const int MinimumDelayInMilliseconds = 1000;
-  private const int MaximumDelayInMilliseonds = 5000;
+  private const int MaximumDelayInMilliseconds = 5000;
 
   private readonly ILogger<Worker> _logger;
   private readonly IMqttClient _mqttClient;
   private readonly IMqttSettings _mqttSettings;
   private readonly IStockLevelEmitterSettings _stockLevelEmitterSettings;
+
+  private readonly CancellationTokenSource _internalCancellationTokenSource = new();
 
   public Worker(ILogger<Worker> logger,
     IMqttClient mqttClient,
@@ -30,11 +33,15 @@ public class Worker : BackgroundService
 
   public override async Task StartAsync(CancellationToken cancellationToken)
   {
-    var mqttClientOptions = MqttClientOptionsProvider.Get(_mqttSettings);
-    var response = await _mqttClient.ConnectAsync(mqttClientOptions, cancellationToken);
-    if (response.ResultCode != MqttClientConnectResultCode.Success)
+    var connectionResult = await MqttRetryPolicies.GetMqttConnectRetryPolicy(_logger)
+      .ExecuteAsync(async () => await _mqttClient.ConnectAsync(
+        MqttClientOptionsProvider.Get(_mqttSettings),
+        cancellationToken));
+
+    if (connectionResult.ResultCode != MqttClientConnectResultCode.Success)
     {
-      _logger.LogCritical("Could not connect to mqtt broker");
+      _logger.LogCritical("Failed to connect to MQTT broker after retries. Stopping service...");
+      _internalCancellationTokenSource.Cancel();
     }
 
     await base.StartAsync(cancellationToken);
@@ -50,38 +57,41 @@ public class Worker : BackgroundService
 
   protected override async Task ExecuteAsync(CancellationToken stoppingToken)
   {
-    while (!stoppingToken.IsCancellationRequested)
-    {
-      await PublishMessageStockLevelChanged(stoppingToken);
+    using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, _internalCancellationTokenSource.Token);
+    var combinedToken = linkedCts.Token;
 
-      int delayInMilliseconds = Random.Next(MinimumDelayInMilliseconds, MaximumDelayInMilliseonds);
-      await Task.Delay(delayInMilliseconds, stoppingToken);
+    while (!combinedToken.IsCancellationRequested)
+    {
+      await PublishMessageStockLevelChanged(combinedToken);
+
+      int delayInMilliseconds = Random.Next(MinimumDelayInMilliseconds, MaximumDelayInMilliseconds);
+      await Task.Delay(delayInMilliseconds, combinedToken);
     }
   }
 
   private async Task PublishMessageStockLevelChanged(CancellationToken cancellationToken)
   {
     if (!_mqttClient.IsConnected)
-      return;
-
-    if (_logger.IsEnabled(LogLevel.Information))
     {
-      _logger.LogInformation(
-        "Emitting Stock Level Decrease: {productName} decreased by {stockDecreaseAmount} at {time}",
-        _stockLevelEmitterSettings.ProductName,
-        _stockLevelEmitterSettings.StockDecreaseAmount,
-        DateTimeOffset.Now);
+      _logger.LogCritical("Could not publish message {messageType}: no connection to the broker", nameof(MqttMessageStockLevelChanged));
+      return;
     }
 
-    using var activity = InstrumentationSources.ActivitySource.StartActivity("Emitting Stock Level Decrease");
-    activity?.SetBaggage("product.name", _stockLevelEmitterSettings.ProductName);
-    activity?.SetTag("product.name", _stockLevelEmitterSettings.ProductName);
-    activity?.SetTag("product.stock_decrease_amount", _stockLevelEmitterSettings.StockDecreaseAmount);
+    _logger.LogInformation(
+      "Emitting Article Stock Level Decrease: {articleName} decreased by {stockDecreaseAmount} at {time}",
+      _stockLevelEmitterSettings.ArticleName,
+      _stockLevelEmitterSettings.StockDecreaseAmount,
+      DateTimeOffset.Now);
 
-    var message = new MqttMessageStockLevelChanged(_stockLevelEmitterSettings.ProductName, _stockLevelEmitterSettings.StockDecreaseAmount);
-    var mqttMessage = MqttApplicationMessageProvider.Get(
-      _mqttSettings.TopicNamePublish ?? throw new InvalidOperationException($"No {nameof(IMqttSettings.TopicNamePublish)} specified."),
-      message);
+    using var activity = ActivitySourceProvider.ActivitySource.StartActivity("Emitting Article Stock Level Decrease");
+    activity?.SetBaggage("article.name", _stockLevelEmitterSettings.ArticleName);
+    activity?.SetTag("article.name", _stockLevelEmitterSettings.ArticleName);
+    activity?.SetTag("article.stock_decrease_amount", _stockLevelEmitterSettings.StockDecreaseAmount);
+
+    var mqttMessage = MqttApplicationMessageProvider.GetPublishMqttApplicationMessage(
+      _mqttSettings.GetRequiredTopicNamePublish(),
+      new MqttMessageStockLevelChanged(_stockLevelEmitterSettings.ArticleName, _stockLevelEmitterSettings.StockDecreaseAmount));
+    
     await _mqttClient.PublishAsync(mqttMessage, cancellationToken);
   }
 }

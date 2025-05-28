@@ -1,5 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using SmartReplenishment.Messaging.Http;
 using SmartReplenishment.Messaging.Mqtt;
 using SmartReplenishment.Services.Inventory.BackgroundServices;
 using SmartReplenishment.Services.Inventory.Data;
@@ -9,17 +10,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Mqtt Settings
 IMqttSettings? mqttSettings = builder.Configuration
   .GetRequiredSection(IMqttSettings.MqttSettingsKey)
-  .Get<IMqttSettings>();
+  .Get<MqttSettings>();
 
 ArgumentNullException.ThrowIfNull(mqttSettings);
-mqttSettings.ClientId ??= builder.Environment.ApplicationName;
 
 // Register Services
 builder.Services.AddSingleton<IMqttSettings>(mqttSettings);
-
 builder.AddServiceDefaults();
 
-// Database
+// Register Database Context
 builder.Services.AddDbContext<InventoryDbContext>(options => options
   .UseNpgsql(builder.Configuration.GetConnectionString("InventoryDb")));
 
@@ -28,7 +27,7 @@ builder.Services.AddHostedService<Worker>();
 
 var app = builder.Build();
 
-// Database Seed
+// Seed Database
 using (var scope = app.Services.CreateScope())
 {
   var context = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
@@ -37,21 +36,23 @@ using (var scope = app.Services.CreateScope())
   DatabaseSeeder.Seed(context);
 }
 
-app.MapPost("/stock/{productName}/increase", async (
-  string productName, int amount, InventoryDbContext context) =>
+app.MapPut("/stock/{articleId}/increase", async (
+  Guid articleId,
+  [FromBody] StockAmountIncrease stockAmountIncrease,
+  InventoryDbContext context) =>
 {
-  var stockProduct = await context.StockProducts
-    .FirstOrDefaultAsync(p => p.Name == productName);
+  var stockArticle = await context.StockArticles
+    .FirstOrDefaultAsync(p => p.Id == articleId);
 
-  if (stockProduct is null)
+  if (stockArticle is null)
   {
-    return Results.NotFound($"Product '{productName}' not found.");
+    return Results.NotFound($"Article '{articleId}' not found.");
   }
 
-  stockProduct.Amount += amount;
+  stockArticle.Amount += stockAmountIncrease.Amount;
   await context.SaveChangesAsync();
 
-  return Results.Ok($"Stock for '{productName}' increased by {amount}.");
+  return Results.Ok($"Stock for '{articleId}' increased by {stockAmountIncrease.Amount}.");
 });
 
 app.Run();
