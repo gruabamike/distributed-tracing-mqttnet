@@ -2,14 +2,14 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MQTTnet;
 
-namespace SmartReplenishment.Observability.Instrumentation.MqttNetClient;
+namespace SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator;
 
 public static class MqttNetClientInstrumentationExtensions
 {
-  public static IServiceCollection AddMqttNetClientInstrumentation(this IServiceCollection services)
-    => services.AddMqttNetClientInstrumentation(new MqttClientFactory());
+  public static IServiceCollection AddMqttNetClientDecoratorTracing(this IServiceCollection services)
+    => services.AddMqttNetClientDecoratorTracing(new MqttClientFactory());
 
-  public static IServiceCollection AddMqttNetClientInstrumentation(this IServiceCollection services, MqttClientFactory mqttClientFactory)
+  public static IServiceCollection AddMqttNetClientDecoratorTracing(this IServiceCollection services, MqttClientFactory mqttClientFactory)
   {
     ArgumentNullException.ThrowIfNull(services);
     ArgumentNullException.ThrowIfNull(mqttClientFactory);

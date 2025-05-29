@@ -8,8 +8,25 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.5" />
-    <PackageReference Include="MQTTnet" Version="5.0.1.1416" />
     <PackageReference Include="Polly" Version="8.5.2" />
   </ItemGroup>
+
+  <ItemGroup Condition="'$(MqttInstrumentationType)' == 'DecoratorBased'">
+    <PackageReference Include="MQTTnet" Version="5.0.1.1416" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(MqttInstrumentationType)' == 'ActivitySourceBased'">
+    <PackageReference Include="MQTTnet.ActivitySourceInstrumentation" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(MqttInstrumentationType)' == 'DiagnosticListenerBased'">
+    <PackageReference Include="MQTTnet.DiagnosticListenerInstrumentation" Version="1.0.0" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <DefineConstants Condition="'$(MqttInstrumentationType)' == 'DecoratorBased'">$(DefineConstants);MQTT_INSTRUMENTATION_TYPE_DECORATOR</DefineConstants>
+    <DefineConstants Condition="'$(MqttInstrumentationType)' == 'ActivitySourceBased'">$(DefineConstants);MQTT_INSTRUMENTATION_TYPE_ACTIVITYSOURCE</DefineConstants>
+    <DefineConstants Condition="'$(MqttInstrumentationType)' == 'DiagnosticListenerBased'">$(DefineConstants);MQTT_INSTRUMENTATION_TYPE_DIAGNOSTICLISTENER</DefineConstants>
+  </PropertyGroup>
 
 </Project>

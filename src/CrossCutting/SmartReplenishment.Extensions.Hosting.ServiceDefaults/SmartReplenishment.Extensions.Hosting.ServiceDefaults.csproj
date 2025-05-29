@@ -20,8 +20,24 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SmartReplenishment.Observability.Instrumentation.MqttNetClient\SmartReplenishment.Observability.Instrumentation.MqttNetClient.csproj" />
+  <ItemGroup Condition="'$(MqttInstrumentationType)' == 'DecoratorBased'">
+    <ProjectReference Include="..\SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator\SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator.csproj" />
   </ItemGroup>
+
+  <ItemGroup Condition="'$(MqttInstrumentationType)' == 'ActivitySourceBased'">
+    <ProjectReference Include="..\SmartReplenishment.OTel.Instrumentation.MqttNetClientActivity\SmartReplenishment.OTel.Instrumentation.MqttNetClientActivity.csproj" />
+    <PackageReference Include="MQTTnet.ActivitySourceInstrumentation" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(MqttInstrumentationType)' == 'DiagnosticListenerBased'">
+    <ProjectReference Include="..\SmartReplenishment.OTel.Instrumentation.MqttNetClientListener\SmartReplenishment.OTel.Instrumentation.MqttNetClientListener.csproj" />
+    <PackageReference Include="MQTTnet.DiagnosticListenerInstrumentation" Version="1.0.0" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <DefineConstants Condition="'$(MqttInstrumentationType)' == 'DecoratorBased'">$(DefineConstants);MQTT_INSTRUMENTATION_TYPE_DECORATOR</DefineConstants>
+    <DefineConstants Condition="'$(MqttInstrumentationType)' == 'ActivitySourceBased'">$(DefineConstants);MQTT_INSTRUMENTATION_TYPE_ACTIVITYSOURCE</DefineConstants>
+    <DefineConstants Condition="'$(MqttInstrumentationType)' == 'DiagnosticListenerBased'">$(DefineConstants);MQTT_INSTRUMENTATION_TYPE_DIAGNOSTICLISTENER</DefineConstants>
+  </PropertyGroup>
 
 </Project>

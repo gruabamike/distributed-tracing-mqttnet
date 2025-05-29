@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 
-namespace SmartReplenishment.Observability.Instrumentation.MqttNetClient;
+namespace SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator;
 
 internal sealed class MqttNetClientActivityHelper
 {

@@ -12,6 +12,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+		nuget.config = nuget.config
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{E045658B-F24B-4F9B-AC90-F64411A3D005}"
@@ -19,8 +21,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartReplenishment.Services.Inventory", "Services\SmartReplenishment.Services.Inventory\SmartReplenishment.Services.Inventory.csproj", "{B4BA8D19-C8A9-4881-9D30-BDD079488684}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CrossCutting", "CrossCutting", "{6AB0A50F-536F-4417-838B-D352D60CD8CB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartReplenishment.Observability.Instrumentation.MqttNetClient", "CrossCutting\SmartReplenishment.Observability.Instrumentation.MqttNetClient\SmartReplenishment.Observability.Instrumentation.MqttNetClient.csproj", "{282CAA20-8A6D-49FC-AE92-AC6ACA3DA221}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartReplenishment.Services.Fulfillment", "Services\SmartReplenishment.Services.Fulfillment\SmartReplenishment.Services.Fulfillment.csproj", "{12B48817-1EA1-481A-8C36-8010483AFC74}"
 EndProject
@@ -42,6 +42,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartReplenishment.Services
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartReplenishment.Services.NotificationSMS", "Services\SmartReplenishment.Services.NotificationSMS\SmartReplenishment.Services.NotificationSMS.csproj", "{8CE801FE-4ED0-4932-9752-AF3D5E1207E1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator", "CrossCutting\SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator\SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator.csproj", "{731B88AF-607D-4C71-8680-4B1203DE6D11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartReplenishment.OTel.Instrumentation.MqttNetClientActivity", "CrossCutting\SmartReplenishment.OTel.Instrumentation.MqttNetClientActivity\SmartReplenishment.OTel.Instrumentation.MqttNetClientActivity.csproj", "{D42D48CC-E715-4DE0-9DFB-9808F7A23DD9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartReplenishment.OTel.Instrumentation.MqttNetClientListener", "CrossCutting\SmartReplenishment.OTel.Instrumentation.MqttNetClientListener\SmartReplenishment.OTel.Instrumentation.MqttNetClientListener.csproj", "{461892EA-4A9F-415D-9DD4-37E3AE8ADE08}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,10 +62,6 @@ Global
 		{B4BA8D19-C8A9-4881-9D30-BDD079488684}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B4BA8D19-C8A9-4881-9D30-BDD079488684}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B4BA8D19-C8A9-4881-9D30-BDD079488684}.Release|Any CPU.Build.0 = Release|Any CPU
-		{282CAA20-8A6D-49FC-AE92-AC6ACA3DA221}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{282CAA20-8A6D-49FC-AE92-AC6ACA3DA221}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{282CAA20-8A6D-49FC-AE92-AC6ACA3DA221}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{282CAA20-8A6D-49FC-AE92-AC6ACA3DA221}.Release|Any CPU.Build.0 = Release|Any CPU
 		{12B48817-1EA1-481A-8C36-8010483AFC74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{12B48817-1EA1-481A-8C36-8010483AFC74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12B48817-1EA1-481A-8C36-8010483AFC74}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -100,6 +102,18 @@ Global
 		{8CE801FE-4ED0-4932-9752-AF3D5E1207E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CE801FE-4ED0-4932-9752-AF3D5E1207E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CE801FE-4ED0-4932-9752-AF3D5E1207E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{731B88AF-607D-4C71-8680-4B1203DE6D11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{731B88AF-607D-4C71-8680-4B1203DE6D11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{731B88AF-607D-4C71-8680-4B1203DE6D11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{731B88AF-607D-4C71-8680-4B1203DE6D11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D42D48CC-E715-4DE0-9DFB-9808F7A23DD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D42D48CC-E715-4DE0-9DFB-9808F7A23DD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D42D48CC-E715-4DE0-9DFB-9808F7A23DD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D42D48CC-E715-4DE0-9DFB-9808F7A23DD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{461892EA-4A9F-415D-9DD4-37E3AE8ADE08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{461892EA-4A9F-415D-9DD4-37E3AE8ADE08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{461892EA-4A9F-415D-9DD4-37E3AE8ADE08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{461892EA-4A9F-415D-9DD4-37E3AE8ADE08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -107,7 +121,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{4F92BC89-9AF1-46E9-8575-BF297B7902AA} = {8EE1DEF0-BA5F-4C7B-B6AA-0059FD117C68}
 		{B4BA8D19-C8A9-4881-9D30-BDD079488684} = {52D65012-C164-4E30-AEA5-061281923D65}
-		{282CAA20-8A6D-49FC-AE92-AC6ACA3DA221} = {6AB0A50F-536F-4417-838B-D352D60CD8CB}
 		{12B48817-1EA1-481A-8C36-8010483AFC74} = {52D65012-C164-4E30-AEA5-061281923D65}
 		{AA777258-0A74-4295-BE47-05EFE1F18D5F} = {6AB0A50F-536F-4417-838B-D352D60CD8CB}
 		{42B53C60-00BF-4D77-AD42-A8F7A70F1C47} = {6AB0A50F-536F-4417-838B-D352D60CD8CB}
@@ -118,6 +131,9 @@ Global
 		{263406D6-2012-4444-9845-71626836E25D} = {6AB0A50F-536F-4417-838B-D352D60CD8CB}
 		{A95478BB-A1EA-4238-B75E-573EF57D5BDB} = {52D65012-C164-4E30-AEA5-061281923D65}
 		{8CE801FE-4ED0-4932-9752-AF3D5E1207E1} = {52D65012-C164-4E30-AEA5-061281923D65}
+		{731B88AF-607D-4C71-8680-4B1203DE6D11} = {6AB0A50F-536F-4417-838B-D352D60CD8CB}
+		{D42D48CC-E715-4DE0-9DFB-9808F7A23DD9} = {6AB0A50F-536F-4417-838B-D352D60CD8CB}
+		{461892EA-4A9F-415D-9DD4-37E3AE8ADE08} = {6AB0A50F-536F-4417-838B-D352D60CD8CB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0AE40CC3-26E5-4175-8A38-3B1287E3AA1D}

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace SmartReplenishment.Observability.Instrumentation.MqttNetClient;
+namespace SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator;
 
 public class MqttNetClientInstrumentationOptions
 {

@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <!-- Change this to switch between instrumentation approaches -->
+    <!--<MqttInstrumentationType>DecoratorBased</MqttInstrumentationType>-->
+    <MqttInstrumentationType>ActivitySourceBased</MqttInstrumentationType>
+    <!--<MqttInstrumentationType>DiagnosticListenerBased</MqttInstrumentationType>-->
+  </PropertyGroup>
+</Project>

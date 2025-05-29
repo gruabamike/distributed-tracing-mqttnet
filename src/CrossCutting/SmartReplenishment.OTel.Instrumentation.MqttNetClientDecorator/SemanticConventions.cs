@@ -1,4 +1,4 @@
-﻿namespace SmartReplenishment.Observability.Instrumentation.MqttNetClient;
+﻿namespace SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator;
 
 internal static class SemanticConventions
 {

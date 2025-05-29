@@ -1,7 +1,7 @@
 ﻿using MQTTnet.Packets;
 using OpenTelemetry.Context.Propagation;
 
-namespace SmartReplenishment.Observability.Instrumentation.MqttNetClient;
+namespace SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator;
 
 internal static class MqttNetClientContextPropagation
 {
@@ -15,10 +15,14 @@ internal static class MqttNetClientContextPropagation
   internal static IEnumerable<string> Extract(IList<MqttUserProperty>? userProperties, string key)
   {
     if (userProperties is null)
-      return Enumerable.Empty<string>();
+      yield break;
 
-    return userProperties
-      .Where(prop => prop.Name.Equals(key, StringComparison.Ordinal))
-      .Select(prop => prop.Value);
+    int userPropertiesCount = userProperties.Count;
+    for (int i = 0; i < userPropertiesCount; i++)
+    {
+      var userProperty = userProperties[i];
+      if (userProperty.Name.Equals(key, StringComparison.Ordinal))
+        yield return userProperty.Value;
+    }
   }
 }

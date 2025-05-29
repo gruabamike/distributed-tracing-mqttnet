@@ -1,5 +1,4 @@
 using MQTTnet;
-using Polly;
 using SmartReplenishment.Clients.StockLevelEmitter.Instrumentation;
 using SmartReplenishment.Clients.StockLevelEmitter.Settings;
 using SmartReplenishment.Messaging.Mqtt;

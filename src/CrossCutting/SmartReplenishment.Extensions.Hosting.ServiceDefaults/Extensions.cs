@@ -4,11 +4,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ServiceDiscovery;
+using MQTTnet;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using SmartReplenishment.Observability.Instrumentation.MqttNetClient;
+
+#if MQTT_INSTRUMENTATION_TYPE_DECORATOR
+using SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator;
+#elif MQTT_INSTRUMENTATION_TYPE_ACTIVITYSOURCE
+using SmartReplenishment.OTel.Instrumentation.MqttNetClientActivity;
+#elif MQTT_INSTRUMENTATION_TYPE_DIAGNOSTICLISTENER
+using SmartReplenishment.OTel.Instrumentation.MqttNetClientListener;
+#endif
 
 namespace Microsoft.Extensions.Hosting;
 // Adds common .NET Aspire services: service discovery, resilience, health checks, and OpenTelemetry.
@@ -18,7 +26,13 @@ public static class Extensions
 {
   public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
   {
-    builder.Services.AddMqttNetClientInstrumentation();
+    // Register IMqttClient as singleton
+#if MQTT_INSTRUMENTATION_TYPE_DECORATOR
+    builder.Services.AddMqttNetClientDecoratorTracing();
+#elif MQTT_INSTRUMENTATION_TYPE_ACTIVITYSOURCE || MQTT_INSTRUMENTATION_TYPE_DIAGNOSTICLISTENER
+    builder.Services.AddSingleton<IMqttClient>(sp => new MqttClientFactory().CreateMqttClient());
+#endif
+
     builder.ConfigureOpenTelemetry();
 
     builder.AddDefaultHealthChecks();

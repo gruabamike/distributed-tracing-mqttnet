@@ -4,7 +4,7 @@ using OpenTelemetry;
 using OpenTelemetry.Context.Propagation;
 using System.Diagnostics;
 
-namespace SmartReplenishment.Observability.Instrumentation.MqttNetClient;
+namespace SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator;
 
 public sealed class MqttNetClientDecoratorTracing : MqttNetClientDecorator
 {

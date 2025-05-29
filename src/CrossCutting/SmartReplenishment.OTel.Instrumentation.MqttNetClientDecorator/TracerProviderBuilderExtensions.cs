@@ -2,7 +2,7 @@
 using MQTTnet;
 using OpenTelemetry.Trace;
 
-namespace SmartReplenishment.Observability.Instrumentation.MqttNetClient;
+namespace SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator;
 
 /// <summary>
 /// Extension methods to simplify registering of dependency instrumentation.
@@ -24,7 +24,7 @@ public static class TracerProviderBuilderExtensions
         throw new InvalidOperationException($"Service of type .{nameof(IMqttClient)} is not an instance of {nameof(MqttNetClientDecoratorTracing)}. " +
           $"Use {nameof(MqttNetClientInstrumentationExtensions)} to register the corresponding decorator instance.");
 
-      return AddMqttNetClientInstrumentation(builder, new MqttNetClientInstrumentationOptions(), configure);
+      return builder.AddMqttNetClientInstrumentation(new MqttNetClientInstrumentationOptions(), configure);
     }
 
     return deferredTracerProviderBuilder.Configure((serviceProvider, builder) =>

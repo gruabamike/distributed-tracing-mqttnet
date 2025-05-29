@@ -1,7 +1,7 @@
 ﻿using MQTTnet;
 using MQTTnet.Diagnostics.PacketInspection;
 
-namespace SmartReplenishment.Observability.Instrumentation.MqttNetClient;
+namespace SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator;
 
 public abstract class MqttNetClientDecorator : IMqttClient
 {
