@@ -17,6 +17,7 @@
 
   <ItemGroup Condition="'$(MqttInstrumentationType)' == 'ActivitySourceBased'">
     <PackageReference Include="MQTTnet.ActivitySourceInstrumentation" Version="1.0.0" />
+    <!--<ProjectReference Include="..\..\..\..\MQTTnet\Source\MQTTnet\MQTTnet.csproj" />-->
   </ItemGroup>
 
   <ItemGroup Condition="'$(MqttInstrumentationType)' == 'DiagnosticListenerBased'">

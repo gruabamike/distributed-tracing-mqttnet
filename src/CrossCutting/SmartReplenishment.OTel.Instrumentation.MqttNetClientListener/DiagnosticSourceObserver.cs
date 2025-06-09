@@ -28,13 +28,13 @@ internal class DiagnosticSourceObserver : IObserver<KeyValuePair<string, object>
       switch (key)
       {
         case string k when k.EndsWith("Start", StringComparison.Ordinal):
-          _handler.OnStartActivity(activity, value.Value);
+          _handler.OnStartActivity(k, activity, value.Value);
           break;
         case string k when k.EndsWith("Stop", StringComparison.Ordinal):
-          _handler.OnStopActivity(activity, value.Value);
+          _handler.OnStopActivity(k, activity, value.Value);
           break;
         case string k when k.EndsWith("Exception", StringComparison.Ordinal):
-          _handler.OnException(activity, value.Value);
+          _handler.OnException(k, activity, value.Value);
           break;
         default:
           _handler.OnCustom(key, activity, value.Value);

@@ -5,15 +5,11 @@ namespace SmartReplenishment.OTel.Instrumentation.MqttNetClientListener;
 public static class TracerProviderBuilderExtensions
 {
   public static TracerProviderBuilder AddMqttNetClientInstrumentation(
-    this TracerProviderBuilder builder,
-    Action<MqttNetClientInstrumentationOptions>? configureOptions = null)
+    this TracerProviderBuilder builder)
   {
     ArgumentNullException.ThrowIfNull(builder);
 
-    var options = new MqttNetClientInstrumentationOptions();
-    configureOptions?.Invoke(options);
-
-    builder.AddInstrumentation(() => new MqttNetClientInstrumentation(options));
+    builder.AddInstrumentation(() => new MqttNetClientInstrumentation());
     builder.AddSource(DiagnosticSourceListenerMqttNetClient.ActivitySourceName);
     return builder;
   }

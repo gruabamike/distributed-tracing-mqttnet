@@ -4,10 +4,10 @@ internal class MqttNetClientInstrumentation : IDisposable
 {
   private readonly DiagnosticSourceSubscriber _diagnosticSourceSubscriber;
 
-  public MqttNetClientInstrumentation(MqttNetClientInstrumentationOptions? options = null)
+  public MqttNetClientInstrumentation()
   {
     _diagnosticSourceSubscriber = new DiagnosticSourceSubscriber(
-      name => new DiagnosticSourceListenerMqttNetClient(name, options),
+      name => new DiagnosticSourceListenerMqttNetClient(name),
       listener => listener.Name == DiagnosticSourceListenerMqttNetClient.DiagnosticSourceName,
       null);
     _diagnosticSourceSubscriber.Subscribe();

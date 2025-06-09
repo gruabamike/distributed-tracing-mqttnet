@@ -15,11 +15,11 @@ internal abstract class DiagnosticSourceListenerBase
 
   public virtual bool SupportsNullActivity { get; }
 
-  public virtual void OnStartActivity(Activity? activity, object? payload) { }
+  public virtual void OnStartActivity(string name, Activity? activity, object? payload) { }
 
-  public virtual void OnStopActivity(Activity? activity, object? payload) { }
+  public virtual void OnStopActivity(string name, Activity? activity, object? payload) { }
 
-  public virtual void OnException(Activity? activity, object? payload) { }
+  public virtual void OnException(string name, Activity? activity, object? payload) { }
 
   public virtual void OnCustom(string name, Activity? activity, object? payload) { }
 }

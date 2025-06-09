@@ -11,8 +11,7 @@ public static class TracerProviderBuilderExtensions
 {
   public static TracerProviderBuilder AddMqttNetClientInstrumentation(
     this TracerProviderBuilder builder,
-    IMqttClient? mqttClient = null,
-    Action<MqttNetClientInstrumentationOptions>? configure = null)
+    IMqttClient? mqttClient)
   {
     ArgumentNullException.ThrowIfNull(builder);
 
@@ -24,7 +23,7 @@ public static class TracerProviderBuilderExtensions
         throw new InvalidOperationException($"Service of type .{nameof(IMqttClient)} is not an instance of {nameof(MqttNetClientDecoratorTracing)}. " +
           $"Use {nameof(MqttNetClientInstrumentationExtensions)} to register the corresponding decorator instance.");
 
-      return builder.AddMqttNetClientInstrumentation(new MqttNetClientInstrumentationOptions(), configure);
+      return builder.AddMqttNetClientInstrumentation();
     }
 
     return deferredTracerProviderBuilder.Configure((serviceProvider, builder) =>
@@ -40,8 +39,7 @@ public static class TracerProviderBuilderExtensions
           $"Use {nameof(MqttNetClientInstrumentationExtensions)} to register the corresponding decorator instance.");
       }
 
-      var optionService = serviceProvider.GetService(typeof(IOptions<MqttNetClientInstrumentationOptions>)) as IOptions<MqttNetClientInstrumentationOptions>;
-      AddMqttNetClientInstrumentation(builder, optionService?.Value ?? new MqttNetClientInstrumentationOptions(), configure);
+      AddMqttNetClientInstrumentation(builder);
     });
   }
 
@@ -52,13 +50,9 @@ public static class TracerProviderBuilderExtensions
   /// <param name="configureOptions">MQTTnet client instrumentation configuration options.</param>
   /// <returns>The instance of <see cref="TracerProviderBuilder"/> to chain the calls.</returns>
   private static TracerProviderBuilder AddMqttNetClientInstrumentation(
-    this TracerProviderBuilder builder,
-    MqttNetClientInstrumentationOptions options,
-    Action<MqttNetClientInstrumentationOptions>? configure = null)
+    this TracerProviderBuilder builder)
   {
-    configure?.Invoke(options);
-    
-    builder.AddSource(MqttNetClientActivityHelper.ActivitySourceName);
+    builder.AddSource(MqttNetClientInstrumentationSource.ActivitySourceName);
     return builder;
   }
 }

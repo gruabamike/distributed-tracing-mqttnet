@@ -1,8 +1,8 @@
 ﻿using MQTTnet;
 using System.Diagnostics;
-using static SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator.TraceSemanticConventions;
+using static SmartReplenishment.OTel.Instrumentation.MqttNetClientListener.TraceSemanticConventions;
 
-namespace SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator;
+namespace SmartReplenishment.OTel.Instrumentation.MqttNetClientListener;
 
 internal static class MqttNetClientActivityHelper
 {

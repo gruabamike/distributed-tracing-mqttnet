@@ -27,11 +27,13 @@
   <ItemGroup Condition="'$(MqttInstrumentationType)' == 'ActivitySourceBased'">
     <ProjectReference Include="..\SmartReplenishment.OTel.Instrumentation.MqttNetClientActivity\SmartReplenishment.OTel.Instrumentation.MqttNetClientActivity.csproj" />
     <PackageReference Include="MQTTnet.ActivitySourceInstrumentation" Version="1.0.0" />
+    <!--<ProjectReference Include="..\..\..\..\MQTTnet\Source\MQTTnet\MQTTnet.csproj" />-->
   </ItemGroup>
 
   <ItemGroup Condition="'$(MqttInstrumentationType)' == 'DiagnosticListenerBased'">
     <ProjectReference Include="..\SmartReplenishment.OTel.Instrumentation.MqttNetClientListener\SmartReplenishment.OTel.Instrumentation.MqttNetClientListener.csproj" />
-    <PackageReference Include="MQTTnet.DiagnosticListenerInstrumentation" Version="1.0.0" />
+    <!--<PackageReference Include="MQTTnet.DiagnosticListenerInstrumentation" Version="1.0.0" />-->
+    <ProjectReference Include="..\..\..\..\MQTTnet\Source\MQTTnet\MQTTnet.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
