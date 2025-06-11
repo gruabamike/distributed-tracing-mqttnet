@@ -1,17 +1,16 @@
 ﻿using MQTTnet;
 using MQTTnet.Packets;
-using OpenTelemetry.Trace;
 using System.Diagnostics;
 
 namespace SmartReplenishment.OTel.Instrumentation.MqttNetClientListener;
 
-internal sealed class DiagnosticSourceListenerMqttNetClient : DiagnosticSourceListenerBase
+internal sealed class DiagnosticSourceListenerMqttClient : DiagnosticSourceListenerBase
 {
-  internal static readonly string ActivitySourceName = typeof(DiagnosticSourceListenerMqttNetClient).Assembly.GetName().Name!;
+  internal static readonly string ActivitySourceName = typeof(DiagnosticSourceListenerMqttClient).Assembly.GetName().Name!;
 
   internal const string DiagnosticSourceName = "MQTTnet.MqttClient";
-
   internal const string EventNamePrefix = DiagnosticSourceName;
+
   public const string EventNamePublishStart = $"{EventNamePrefix}.Publish.Start";
   public const string EventNamePublishStop = $"{EventNamePrefix}.Publish.Stop";
   public const string EventNamePublishError = $"{EventNamePrefix}.Publish.Exception";
@@ -21,7 +20,7 @@ internal sealed class DiagnosticSourceListenerMqttNetClient : DiagnosticSourceLi
 
   public override bool SupportsNullActivity => true;
 
-  public DiagnosticSourceListenerMqttNetClient(string sourceName) : base(sourceName)
+  public DiagnosticSourceListenerMqttClient(string sourceName) : base(sourceName)
   {
   }
 
@@ -32,51 +31,51 @@ internal sealed class DiagnosticSourceListenerMqttNetClient : DiagnosticSourceLi
       case EventNamePublishStart:
         {
           if (
-            !AnonymousObjectPropertyFetcher.TryGetProperty(payload, "ApplicationMessage", out MqttApplicationMessage? applicationMessage) ||
-            !AnonymousObjectPropertyFetcher.TryGetProperty(payload, "Options", out MqttClientOptions? mqttClientOptions))
+            !PropertyFetcher.TryGetProperty(payload, "ApplicationMessage", out MqttApplicationMessage? applicationMessage) ||
+            !PropertyFetcher.TryGetProperty(payload, "Options", out MqttClientOptions? mqttClientOptions))
           {
-            InstrumentationEventSource.Log.NullPayload(nameof(DiagnosticSourceListenerMqttNetClient), name);
+            InstrumentationEventSource.Log.NullPayload(nameof(DiagnosticSourceListenerMqttClient), name);
             return;
           }
 
-          activity = MqttNetClientInstrumentationSource.ActivitySource.StartActivity(
-            MqttNetClientActivityHelper.ActivityNamePublish(applicationMessage.Topic),
+          activity = MqttClientActivitySourceProvider.ActivitySource.StartActivity(
+            MqttClientActivityHelper.GetActivityNamePublish(applicationMessage.Topic),
             ActivityKind.Producer,
             default(ActivityContext),
-            MqttNetClientActivityHelper.PublishTags(applicationMessage, mqttClientOptions));
+            MqttClientActivityHelper.PublishTags(applicationMessage, mqttClientOptions));
 
           if (activity is null)
             return; // there is no listener or the sampler decided not to sample the current trace
 
           applicationMessage.UserProperties ??= new List<MqttUserProperty>();
-          MqttNetClientContextPropagationHandler.Inject(activity.Context, applicationMessage.UserProperties);
+          MqttClientContextPropagationHandler.Inject(activity.Context, applicationMessage.UserProperties);
 
           if (activity.IsAllDataRequested)
-            MqttNetClientActivityHelper.AddAdditionalTags(activity, applicationMessage, mqttClientOptions);
+            MqttClientActivityHelper.AddAdditionalTags(activity, applicationMessage, mqttClientOptions);
         }
         break;
       case EventNameConsumeStart:
         {
           if (
-            !AnonymousObjectPropertyFetcher.TryGetProperty(payload, "ApplicationMessage", out MqttApplicationMessage? applicationMessage) ||
-            !AnonymousObjectPropertyFetcher.TryGetProperty(payload, "Options", out MqttClientOptions? mqttClientOptions))
+            !PropertyFetcher.TryGetProperty(payload, "ApplicationMessage", out MqttApplicationMessage? applicationMessage) ||
+            !PropertyFetcher.TryGetProperty(payload, "Options", out MqttClientOptions? mqttClientOptions))
           {
-            InstrumentationEventSource.Log.NullPayload(nameof(DiagnosticSourceListenerMqttNetClient), name);
+            InstrumentationEventSource.Log.NullPayload(nameof(DiagnosticSourceListenerMqttClient), name);
             return;
           }
 
-          var parentContext = MqttNetClientContextPropagationHandler.Extract(applicationMessage.UserProperties);
-          activity = MqttNetClientInstrumentationSource.ActivitySource.StartActivity(
-            MqttNetClientActivityHelper.ActivityNameConsume(applicationMessage.Topic),
+          var parentContext = MqttClientContextPropagationHandler.Extract(applicationMessage.UserProperties);
+          activity = MqttClientActivitySourceProvider.ActivitySource.StartActivity(
+            MqttClientActivityHelper.GetActivityNameConsume(applicationMessage.Topic),
             ActivityKind.Consumer,
             parentContext.ActivityContext,
-            MqttNetClientActivityHelper.ConsumeTags(applicationMessage, mqttClientOptions));
+            MqttClientActivityHelper.ConsumeTags(applicationMessage, mqttClientOptions));
 
           if (activity is null)
             return; // there is no listener or the sampler decided not to sample the current trace
 
           if (activity.IsAllDataRequested)
-            MqttNetClientActivityHelper.AddAdditionalTags(activity, applicationMessage, mqttClientOptions);
+            MqttClientActivityHelper.AddAdditionalTags(activity, applicationMessage, mqttClientOptions);
         }
         break;
     }
@@ -95,7 +94,7 @@ internal sealed class DiagnosticSourceListenerMqttNetClient : DiagnosticSourceLi
             return;
           }
 
-          if (activity.Source != MqttNetClientInstrumentationSource.ActivitySource)
+          if (activity.Source != MqttClientActivitySourceProvider.ActivitySource)
             return;
 
           try
@@ -122,27 +121,22 @@ internal sealed class DiagnosticSourceListenerMqttNetClient : DiagnosticSourceLi
             return;
           }
 
-          if (activity.Source != MqttNetClientInstrumentationSource.ActivitySource)
+          if (activity.Source != MqttClientActivitySourceProvider.ActivitySource)
             return;
 
           try
           {
             if (activity.IsAllDataRequested)
             {
-              if (AnonymousObjectPropertyFetcher.TryGetProperty(payload, "Exception", out Exception? exception))
+              if (PropertyFetcher.TryGetProperty(payload, "Exception", out Exception? exception))
                 activity.SetStatus(ActivityStatusCode.Error, exception.Message);
               else
-                InstrumentationEventSource.Log.NullPayload(nameof(DiagnosticSourceListenerMqttNetClient), name);
+                InstrumentationEventSource.Log.NullPayload(nameof(DiagnosticSourceListenerMqttClient), name);
             }
           }
           finally { activity.Stop(); }
         }
         break;
     }
-  }
-
-  public override void OnCustom(string name, Activity? activity, object? payload)
-  {
-    
   }
 }

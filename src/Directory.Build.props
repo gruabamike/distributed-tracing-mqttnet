@@ -1,8 +1,17 @@
 <Project>
   <PropertyGroup>
     <!-- Change this to switch between instrumentation approaches -->
+    
+    <!-- Instrumentation: MQTT Decorator -->
     <!--<MqttInstrumentationType>DecoratorBased</MqttInstrumentationType>-->
+    
+    <!-- Instrumentation: Fork of MQTT + manual instrumentation using ActivitySource -->
     <MqttInstrumentationType>ActivitySourceBased</MqttInstrumentationType>
+    
+    <!-- Instrumentation: Fork of MQTT + emitting diagnostic events that can be listened to -->
     <!--<MqttInstrumentationType>DiagnosticListenerBased</MqttInstrumentationType>-->
+    
+    <!-- Instrumentaton: OpenTelemetry instrumentation library based on MQTT Decorator -->
+    <!--<MqttInstrumentationType>OpenTelemetryBased</MqttInstrumentationType>-->
   </PropertyGroup>
 </Project>

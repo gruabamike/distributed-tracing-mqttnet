@@ -8,7 +8,7 @@ public static class TracerProviderBuilderExtensions
   {
     ArgumentNullException.ThrowIfNull(builder);
 
-    builder.AddSource(MqttNetClientActivitySourceProvider.ActivitySourceName);
+    builder.AddSource(MqttClientActivitySourceProvider.ActivitySourceName);
     return builder;
   }
 }

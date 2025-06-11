@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace SmartReplenishment.OTel.Instrumentation.MqttNetClientListener;
 
-internal static class AnonymousObjectPropertyFetcher
+internal static class PropertyFetcher
 {
   public static bool TryGetProperty<T>(object? payload, string propertyName, [NotNullWhen(true)] out T? value)
   {

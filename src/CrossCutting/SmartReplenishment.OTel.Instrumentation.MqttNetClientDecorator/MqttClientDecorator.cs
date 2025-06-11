@@ -3,12 +3,12 @@ using MQTTnet.Diagnostics.PacketInspection;
 
 namespace SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator;
 
-public abstract class MqttNetClientDecorator : IMqttClient
+public abstract class MqttClientDecorator : IMqttClient
 {
   private bool _disposedValue;
   protected readonly IMqttClient _mqttClient;
 
-  protected MqttNetClientDecorator(IMqttClient mqttClient)
+  protected MqttClientDecorator(IMqttClient mqttClient)
   {
     _mqttClient = mqttClient;
 

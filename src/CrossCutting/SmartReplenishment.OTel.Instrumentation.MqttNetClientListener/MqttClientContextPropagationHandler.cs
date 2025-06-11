@@ -3,9 +3,9 @@ using OpenTelemetry;
 using OpenTelemetry.Context.Propagation;
 using System.Diagnostics;
 
-namespace SmartReplenishment.OTel.Instrumentation.MqttNetClientDecorator;
+namespace SmartReplenishment.OTel.Instrumentation.MqttNetClientListener;
 
-internal static class MqttNetClientContextPropagationHandler
+internal static class MqttClientContextPropagationHandler
 {
   private static readonly TextMapPropagator s_propagator = Propagators.DefaultTextMapPropagator;
 
